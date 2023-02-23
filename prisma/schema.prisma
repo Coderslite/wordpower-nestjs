@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  email       String        @unique
+  password    String
+  name        String
+  posts       Post[]
+  comment     Comment[]
+  PostLiked   PostLiked[]
+  PostSaved   PostSaved[]
+  commentiked commentiked[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  ProfilePics ProfileImage?
+}
+
+model ProfileImage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileImage String
+  phoneNumber  String
+  dob          String
+  imageUrl     String
+  authorId     String   @unique @db.ObjectId
+  author       Users    @relation(fields: [authorId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Post {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  body      String
+  author    Users        @relation(fields: [authorId], references: [id])
+  authorId  String       @db.ObjectId
+  comments  Comment[]
+  PostLiked PostLiked[]
+  PostSaved PostSaved[]
+  images    PostImages[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model PostImages {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  postId   String @db.ObjectId
+  post     Post   @relation(fields: [postId], references: [id])
+  imageUrl String
+}
+
+model Comment {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  message     String
+  postId      String        @db.ObjectId
+  authorId    String        @db.ObjectId
+  posts       Post          @relation(fields: [postId], references: [id])
+  author      Users         @relation(fields: [authorId], references: [id])
+  commentiked commentiked[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model commentiked {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  comment   Comment  @relation(fields: [postId], references: [id])
+  authorId  String   @db.ObjectId
+  author    Users    @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PostLiked {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  authorId  String   @db.ObjectId
+  author    Users    @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PostSaved {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  authorId  String   @db.ObjectId
+  author    Users    @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
