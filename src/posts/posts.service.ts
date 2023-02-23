@@ -7,10 +7,15 @@ import { Me } from 'src/auth/guards/me.guard';
 @Injectable()
 export class PostsService {
   constructor(private prismaService: PrismaService) {}
-  create(createPostDto: CreatePostDto) {
-    return this.prismaService.post.create({
+  async create(createPostDto: CreatePostDto) {
+    const post= await  this.prismaService.post.create({
       data: createPostDto,
     });
+    return {
+      status:true,
+      message:"post created successfully",
+      data:post
+    }
   }
 
   async findAll() {
